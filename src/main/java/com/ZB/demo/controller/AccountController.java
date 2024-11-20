@@ -1,13 +1,17 @@
 package com.ZB.demo.controller;
 
-import com.ZB.demo.domain.Account;
+import com.ZB.demo.dto.request.CreateAccountRequest;
+import com.ZB.demo.dto.request.UnRegisterAccountRequest;
+import com.ZB.demo.dto.response.AccountListResponse;
+import com.ZB.demo.dto.response.CreateAccountResponse;
+import com.ZB.demo.dto.response.UnRegisterAccountResponse;
 import com.ZB.demo.service.AccountService;
 import com.ZB.demo.service.RedisTestService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,15 +25,20 @@ public class AccountController {
         return redisTestService.getLock();
     }
 
-    @GetMapping("/create-account")
-    public String createAccount() {
-        accountService.createAccount();
-        return "success";
+    @PostMapping("/create-account")
+    public ResponseEntity<CreateAccountResponse> createAccount(
+            @RequestBody CreateAccountRequest dto) {
+        return ResponseEntity.ok().body(accountService.createAccount(dto));
     }
 
-    @GetMapping("/account/{id}")
-    public Account getAccount(
-            @PathVariable Long id){
-        return accountService.getAccount(id);
+    @PostMapping("/remove-account")
+    public ResponseEntity<UnRegisterAccountResponse> deleteAccount(@RequestBody UnRegisterAccountRequest dto) {
+        return ResponseEntity.ok(accountService.unRegisterAccount(dto));
+    }
+
+    @GetMapping("/account/{memberId}")
+    public ResponseEntity<List<AccountListResponse>> getAccount(
+            @PathVariable String memberId){
+        return ResponseEntity.ok(accountService.getAccountListByMemberId(memberId));
     }
 }
