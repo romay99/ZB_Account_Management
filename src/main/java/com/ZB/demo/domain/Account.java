@@ -27,4 +27,11 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus;
 
+    public boolean useBalance(long amount) {
+        if (this.balance >= amount) {
+            this.balance -= amount;
+            return true;
+        }
+        return false;
+    }
 }

@@ -6,15 +6,22 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
-@Getter
+import java.time.LocalDateTime;
+
+@Entity
 @Setter
+@Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Entity
-public class Member {
+public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String memberId;
+    private long id;
+
+    private TransactionResult result;
+    private long transactionAmount;
+    private String transactionAccountNumber;
+    private LocalDateTime transactionDateTime;
+
 }
