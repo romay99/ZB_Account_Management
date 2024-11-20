@@ -50,6 +50,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(TransactionNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleTransactionNotFoundException(TransactionNotFoundException e) {
+        ErrorResponse response = new ErrorResponse("TRANSACTION_NOT_FOUND", e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AmountNotMatchException.class)
+    public ResponseEntity<ErrorResponse> handleAmountNotMatchException(AmountNotMatchException e) {
+        ErrorResponse response = new ErrorResponse("AMOUNT_NOT_MATCH", e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         ErrorResponse response = new ErrorResponse("ERROR", e.getMessage());

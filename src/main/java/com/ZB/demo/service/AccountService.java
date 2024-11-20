@@ -29,7 +29,7 @@ public class AccountService {
      */
     public CreateAccountResponse createAccount(CreateAccountRequest dto) {
         String userId = dto.getUserId();
-        long initialBalance = dto.getInitialBalance();
+        Integer initialBalance = dto.getInitialBalance();
 
         Member member = memberRepository.findByMemberId(userId)
                 .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다."));

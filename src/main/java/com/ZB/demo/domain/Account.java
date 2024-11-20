@@ -20,18 +20,22 @@ public class Account {
 
     private String memberId;
 
-    private long balance;
+    private Integer balance;
 
     private LocalDateTime madeDateTime;
 
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus;
 
-    public boolean useBalance(long amount) {
+    public boolean useBalance(Integer amount) {
         if (this.balance >= amount) {
             this.balance -= amount;
             return true;
         }
         return false;
+    }
+
+    public void cancelTransaction(Integer amount) {
+        this.balance += amount;
     }
 }

@@ -20,7 +20,7 @@ public class Transaction {
     private long id;
 
     private TransactionResult result;
-    private long transactionAmount;
+    private Integer transactionAmount;
     private String transactionAccountNumber;
     private LocalDateTime transactionDateTime;
 

@@ -10,10 +10,11 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class UseBalanceResponse {
+public class CancelTransactionResponse {
     private String accountNumber;
-    private TransactionResult result;
+    private TransactionResult transactionResult;
     private Long transactionId;
-    private Integer amount;
+    private Long amount;
     private LocalDateTime transactionDateTime;
+
 }

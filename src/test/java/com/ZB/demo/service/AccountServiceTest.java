@@ -42,7 +42,7 @@ class AccountServiceTest {
 
     @Test
     void createAccount() {
-        //give
+        //given
         CreateAccountRequest request1 = CreateAccountRequest.builder()
                 .initialBalance(100)
                 .userId("test1")
@@ -69,7 +69,7 @@ class AccountServiceTest {
 
     @Test
     void unRegisterAccount() {
-        //give
+        //given
         CreateAccountRequest createBalance1 = CreateAccountRequest.builder()
                 .initialBalance(1000)
                 .userId("test1")
@@ -117,7 +117,7 @@ class AccountServiceTest {
 
     @Test
     void getAccountListByMemberId() {
-        //give
+        //given
         String memberId = "test1";
         String userNotFoundException = "empty";
 

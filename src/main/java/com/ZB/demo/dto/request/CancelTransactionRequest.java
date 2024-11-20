@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class UseBalanceRequest {
-    private String userId;
+public class CancelTransactionRequest {
+    private Long transactionId;
     private String accountNumber;
     private Integer amount;
 }

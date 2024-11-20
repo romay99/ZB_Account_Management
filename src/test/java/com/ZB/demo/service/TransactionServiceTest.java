@@ -2,15 +2,15 @@ package com.ZB.demo.service;
 
 import com.ZB.demo.domain.Member;
 import com.ZB.demo.domain.TransactionResult;
+import com.ZB.demo.dto.request.CancelTransactionRequest;
 import com.ZB.demo.dto.request.CreateAccountRequest;
 import com.ZB.demo.dto.request.UnRegisterAccountRequest;
 import com.ZB.demo.dto.request.UseBalanceRequest;
+import com.ZB.demo.dto.response.CancelTransactionResponse;
 import com.ZB.demo.dto.response.CreateAccountResponse;
 import com.ZB.demo.dto.response.UseBalanceResponse;
-import com.ZB.demo.exception.AccountAlreadyUnRegisterdException;
-import com.ZB.demo.exception.AccountNotMatchException;
-import com.ZB.demo.exception.AmountExceedBalanceException;
-import com.ZB.demo.exception.MemberNotFoundException;
+import com.ZB.demo.exception.*;
+import com.ZB.demo.repository.AccountRepository;
 import com.ZB.demo.repository.MemberRepository;
 import com.ZB.demo.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +32,8 @@ class TransactionServiceTest {
     TransactionRepository transactionRepository;
     @Autowired
     AccountService accountService;
+    @Autowired
+    private AccountRepository accountRepository;
 
     @BeforeEach
     void createTestUser() {
@@ -46,7 +48,7 @@ class TransactionServiceTest {
 
     @Test
     void useBalance() {
-        //give
+        //given
         CreateAccountRequest hasBalanceAccount = CreateAccountRequest.builder()
                 .userId("test1")
                 .initialBalance(1000)
@@ -106,5 +108,53 @@ class TransactionServiceTest {
         assertThrows(AmountExceedBalanceException.class, () -> transactionService.useBalance(amountExceedBalanceException));
         assertEquals(500,response.getAmount());
         assertEquals(TransactionResult.SUCCESS, response.getResult());
+    }
+
+    @Test
+    public void cancelTransaction() {
+        //given
+        CreateAccountResponse createAccountResponse = accountService.createAccount(
+                CreateAccountRequest.builder()
+                        .userId("test1")
+                        .initialBalance(1000)
+                        .build()
+        );
+        UseBalanceResponse transactionResponse = transactionService.useBalance(
+                UseBalanceRequest.builder()
+                        .userId("test1")
+                        .amount(500)
+                        .accountNumber(createAccountResponse.getAccountNumber())
+                        .build()
+        );
+
+        CancelTransactionRequest accountNotMatchException = CancelTransactionRequest
+                .builder()
+                .transactionId(transactionResponse.getTransactionId())
+                .accountNumber("11111111")
+                .amount(500)
+                .build();
+
+        CancelTransactionRequest transactionAmountNotMatchException = CancelTransactionRequest
+                .builder()
+                .transactionId(transactionResponse.getTransactionId())
+                .accountNumber(transactionResponse.getAccountNumber())
+                .amount(60000)
+                .build();
+
+        //when
+
+        //then
+        assertThrows(AccountNotMatchException.class, () -> transactionService.cancelTransaction(accountNotMatchException));
+        assertThrows(AmountNotMatchException.class, ()-> transactionService.cancelTransaction(transactionAmountNotMatchException));
+
+        CancelTransactionResponse cancelTransactionResponse = transactionService.cancelTransaction(
+                CancelTransactionRequest.builder()
+                        .transactionId(transactionResponse.getTransactionId())
+                        .amount(transactionResponse.getAmount())
+                        .accountNumber(transactionResponse.getAccountNumber())
+                        .build());
+
+        assertEquals(cancelTransactionResponse.getTransactionResult(), TransactionResult.SUCCESS);
+        assertEquals(1000,accountRepository.findByAccountNumber(cancelTransactionResponse.getAccountNumber()).get().getBalance());
     }
 }
