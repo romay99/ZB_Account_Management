@@ -10,6 +10,7 @@ import com.ZB.demo.exception.*;
 import com.ZB.demo.repository.AccountRepository;
 import com.ZB.demo.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +41,7 @@ class AccountServiceTest {
                 .build());
     }
 
+    @DisplayName("계좌 생성")
     @Test
     void createAccount() {
         //given
@@ -67,6 +69,7 @@ class AccountServiceTest {
         assertEquals(accountRepository.findAllByMemberId("test1").size(),10);
     }
 
+    @DisplayName("계좌 해지")
     @Test
     void unRegisterAccount() {
         //given
@@ -115,6 +118,7 @@ class AccountServiceTest {
         assertNotNull(response.getUnRegisterDateTime());
     }
 
+    @DisplayName("계좌 확인")
     @Test
     void getAccountListByMemberId() {
         //given

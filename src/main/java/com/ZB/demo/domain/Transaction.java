@@ -23,5 +23,6 @@ public class Transaction {
     private Integer transactionAmount;
     private String transactionAccountNumber;
     private LocalDateTime transactionDateTime;
+    private TransactionType transactionType;
 
 }

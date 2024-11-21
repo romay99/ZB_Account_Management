@@ -4,6 +4,7 @@ import com.ZB.demo.domain.*;
 import com.ZB.demo.dto.request.CancelTransactionRequest;
 import com.ZB.demo.dto.request.UseBalanceRequest;
 import com.ZB.demo.dto.response.CancelTransactionResponse;
+import com.ZB.demo.dto.response.TransactionInformationResponse;
 import com.ZB.demo.dto.response.UseBalanceResponse;
 import com.ZB.demo.exception.*;
 import com.ZB.demo.repository.AccountRepository;
@@ -49,6 +50,7 @@ public class TransactionService {
             Transaction transaction = Transaction.builder()
                     .transactionAccountNumber(accountNumber)
                     .result(TransactionResult.SUCCESS)
+                    .transactionType(TransactionType.USE)
                     .transactionAmount(amount)
                     .transactionDateTime(LocalDateTime.now())
                     .build();
@@ -68,6 +70,7 @@ public class TransactionService {
         } else { // 거래 실패
             Transaction transaction = Transaction.builder()
                     .transactionAccountNumber(accountNumber)
+                    .transactionType(TransactionType.USE)
                     .result(TransactionResult.FAIL)
                     .transactionAmount(amount)
                     .transactionDateTime(LocalDateTime.now())
@@ -82,7 +85,7 @@ public class TransactionService {
     @Transactional
     public CancelTransactionResponse cancelTransaction(CancelTransactionRequest dto) {
         long transactionId = dto.getTransactionId();
-        long amount = dto.getAmount();
+        int amount = dto.getAmount();
         String accountNumber = dto.getAccountNumber();
 
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
@@ -103,7 +106,14 @@ public class TransactionService {
             account.cancelTransaction(transaction.getTransactionAmount());
             accountRepository.save(account);
 
-            transactionRepository.delete(transaction);
+            Transaction canCelTransaction = Transaction.builder()
+                    .transactionAccountNumber(accountNumber)
+                    .transactionType(TransactionType.CANCEL)
+                    .result(TransactionResult.SUCCESS)
+                    .transactionAmount(amount)
+                    .transactionDateTime(LocalDateTime.now())
+                    .build();
+            transactionRepository.save(canCelTransaction);
 
             CancelTransactionResponse response = CancelTransactionResponse.builder()
                     .accountNumber(accountNumber)
@@ -115,8 +125,16 @@ public class TransactionService {
 
             return response;
 
-        } else { //실패했던 거래 기록 지우기
-            transactionRepository.delete(transaction);
+        } else {
+            Transaction canCelTransaction = Transaction.builder()
+                    .transactionAccountNumber(accountNumber)
+                    .transactionType(TransactionType.CANCEL)
+                    .result(TransactionResult.FAIL)
+                    .transactionAmount(amount)
+                    .transactionDateTime(LocalDateTime.now())
+                    .build();
+            transactionRepository.save(canCelTransaction);
+
             CancelTransactionResponse response = CancelTransactionResponse.builder()
                     .accountNumber(accountNumber)
                     .transactionResult(TransactionResult.FAIL)
@@ -127,5 +145,26 @@ public class TransactionService {
 
             return response;
         }
+    }
+
+    /**
+     * 거래의 정보를 상세조회하는 메서드
+     * @param id 거래 ID
+     */
+    @Transactional
+    public TransactionInformationResponse getTransactionInformation(long id) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new TransactionNotFoundException("존재하지 않는 거래입니다."));
+
+        TransactionInformationResponse  response = TransactionInformationResponse.builder()
+                .accountNumber(transaction.getTransactionAccountNumber())
+                .transactionType(transaction.getTransactionType())
+                .transactionResult(transaction.getResult())
+                .transactionId(transaction.getId())
+                .amount(transaction.getTransactionAmount())
+                .transactionDateTime(transaction.getTransactionDateTime())
+                .build();
+
+        return response;
     }
 }

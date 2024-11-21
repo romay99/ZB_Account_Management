@@ -2,18 +2,21 @@ package com.ZB.demo.service;
 
 import com.ZB.demo.domain.Member;
 import com.ZB.demo.domain.TransactionResult;
+import com.ZB.demo.domain.TransactionType;
 import com.ZB.demo.dto.request.CancelTransactionRequest;
 import com.ZB.demo.dto.request.CreateAccountRequest;
 import com.ZB.demo.dto.request.UnRegisterAccountRequest;
 import com.ZB.demo.dto.request.UseBalanceRequest;
 import com.ZB.demo.dto.response.CancelTransactionResponse;
 import com.ZB.demo.dto.response.CreateAccountResponse;
+import com.ZB.demo.dto.response.TransactionInformationResponse;
 import com.ZB.demo.dto.response.UseBalanceResponse;
 import com.ZB.demo.exception.*;
 import com.ZB.demo.repository.AccountRepository;
 import com.ZB.demo.repository.MemberRepository;
 import com.ZB.demo.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,6 +49,7 @@ class TransactionServiceTest {
 
     }
 
+    @DisplayName("잔액 사용")
     @Test
     void useBalance() {
         //given
@@ -110,6 +114,7 @@ class TransactionServiceTest {
         assertEquals(TransactionResult.SUCCESS, response.getResult());
     }
 
+    @DisplayName("잔액 사용 취소")
     @Test
     public void cancelTransaction() {
         //given
@@ -156,5 +161,34 @@ class TransactionServiceTest {
 
         assertEquals(cancelTransactionResponse.getTransactionResult(), TransactionResult.SUCCESS);
         assertEquals(1000,accountRepository.findByAccountNumber(cancelTransactionResponse.getAccountNumber()).get().getBalance());
+    }
+
+    @DisplayName("거래 확인")
+    @Test
+    void getTransactionInformation() {
+        // given
+        CreateAccountResponse createAccountResponse = accountService.createAccount(
+                CreateAccountRequest.builder()
+                        .userId("test1")
+                        .initialBalance(1000)
+                        .build()
+        );
+        UseBalanceResponse transactionResponse = transactionService.useBalance(
+                UseBalanceRequest.builder()
+                        .userId("test1")
+                        .amount(500)
+                        .accountNumber(createAccountResponse.getAccountNumber())
+                        .build()
+        );
+
+        // when
+        TransactionInformationResponse response =
+                transactionService.getTransactionInformation(transactionResponse.getTransactionId());
+
+        // then
+        assertEquals(response.getTransactionType(), TransactionType.USE);
+        assertEquals(response.getTransactionResult(), TransactionResult.SUCCESS);
+
+        assertThrows(TransactionNotFoundException.class, () -> transactionService.getTransactionInformation(99999));
     }
 }
