@@ -6,7 +6,6 @@ import com.ZB.demo.dto.response.AccountListResponse;
 import com.ZB.demo.dto.response.CreateAccountResponse;
 import com.ZB.demo.dto.response.UnRegisterAccountResponse;
 import com.ZB.demo.service.AccountService;
-import com.ZB.demo.service.RedisTestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +17,6 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
-    private final RedisTestService redisTestService;
-
-    @GetMapping("/get-lock")
-    public String getLock() {
-        return redisTestService.getLock();
-    }
 
     @PostMapping("/create-account")
     public ResponseEntity<CreateAccountResponse> createAccount(

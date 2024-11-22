@@ -1,5 +1,6 @@
 package com.ZB.demo.controller;
 
+import com.ZB.demo.aop.AccountLock;
 import com.ZB.demo.dto.request.CancelTransactionRequest;
 import com.ZB.demo.dto.request.UseBalanceRequest;
 import com.ZB.demo.dto.response.CancelTransactionResponse;
@@ -16,11 +17,13 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @PostMapping("/use-balance")
+    @AccountLock
     public ResponseEntity<UseBalanceResponse> useBalance(@RequestBody UseBalanceRequest dto) {
         return ResponseEntity.ok().body(transactionService.useBalance(dto));
     }
 
     @DeleteMapping("/transaction")
+    @AccountLock
     public ResponseEntity<CancelTransactionResponse> cancelTransaction(@RequestBody CancelTransactionRequest dto) {
         return ResponseEntity.ok().body(transactionService.cancelTransaction(dto));
     }

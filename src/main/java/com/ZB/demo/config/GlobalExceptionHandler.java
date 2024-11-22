@@ -63,6 +63,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(AccountLockException.class)
+    public ResponseEntity<ErrorResponse> handleAccountLockException(AccountLockException e) {
+        ErrorResponse response = new ErrorResponse("ACCOUNT_LOCK_ERROR", e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         ErrorResponse response = new ErrorResponse("ERROR", e.getMessage());
